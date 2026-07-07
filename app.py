@@ -56,6 +56,23 @@ def maps_link(query):
     from urllib.parse import quote
     return f"https://www.google.com/maps/dir/?api=1&destination={quote(query)}"
 
+def weather_icon(code):
+    if code == 0:
+        return "☀️"
+    if code in (1, 2, 3):
+        return "⛅"
+    if code in (45, 48):
+        return "🌫️"
+    if code in (51, 53, 55, 56, 57):
+        return "🌦️"
+    if code in (61, 63, 65, 66, 67, 80, 81, 82):
+        return "🌧️"
+    if code in (71, 73, 75, 77, 85, 86):
+        return "❄️"
+    if code in (95, 96, 99):
+        return "⛈️"
+    return "🌡️"
+
 def md(html):
     """st.markdown for HTML blocks - strips per-line indentation so Streamlit
     doesn't mistake indented lines for a Markdown code block."""
@@ -112,8 +129,14 @@ div[data-testid="stConnectionStatus"] {display: none;}
 .map-btn { display: inline-flex; align-items: center; background-color: #ffffff; color: #ca6702; border: 1px solid #ca6702; border-radius: 20px; padding: 3px 12px; font-size: 0.8rem; font-weight: bold; text-decoration: none; margin-top: 8px; }
 .alert-card-info { background: linear-gradient(135deg, rgba(10, 147, 150, 0.08) 0%, rgba(0, 95, 115, 0.08) 100%); border-left: 5px solid #0a9396; color: #005f73; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
 .alert-card-success { background: linear-gradient(135deg, rgba(56, 161, 105, 0.08) 0%, rgba(47, 133, 90, 0.08) 100%); border-left: 5px solid #38a169; color: #22543d; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-.weather-now { background: linear-gradient(135deg, #2b6cb0, #1c4a75); color: #fff; border-radius: 16px; padding: 20px; text-align: center; margin-bottom: 14px; }
-.weather-now .temp { font-size: 42px; font-weight: 700; }
+.weather-card { background: #ffffff; border-radius: 20px; padding: 16px 20px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 16px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); }
+.weather-left { display: flex; align-items: center; gap: 14px; }
+.weather-icon-box { width: 46px; height: 46px; border-radius: 14px; background: #e9f3ea; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #4a9c4f; flex-shrink: 0; }
+.weather-label { font-size: 0.78rem; color: #a19b8f; margin-bottom: 2px; }
+.weather-city { font-size: 1.25rem; font-weight: 700; color: #3d3229; }
+.weather-temp-box { background: #f4f2ee; border-radius: 14px; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+.weather-temp-num { font-size: 1.5rem; font-weight: 700; color: #4a9c4f; }
+.weather-temp-icon { font-size: 1.4rem; }
 </style>
 """
 st.markdown(custom_css, unsafe_allow_html=True)
@@ -154,28 +177,24 @@ else:
                 timeout=8,
             ).json()
             cw = wx["current_weather"]
-            md(f"""<div class="weather-now">
-                <div>{city} {('· ' + country) if country else ''}</div>
-                <div class="temp">{round(cw['temperature'])}°C</div>
-                <div>風速 {cw['windspeed']} km/h</div>
+            icon = weather_icon(cw.get("weathercode", -1))
+            md(f"""<div class="weather-card">
+                <div class="weather-left">
+                    <div class="weather-icon-box">↖</div>
+                    <div>
+                        <div class="weather-label">目前城市</div>
+                        <div class="weather-city">{city}</div>
+                    </div>
+                </div>
+                <div class="weather-temp-box">
+                    <span class="weather-temp-num">{round(cw['temperature'])}°C</span>
+                    <span class="weather-temp-icon">{icon}</span>
+                </div>
                 </div>""")
-            days = wx["daily"]["time"]
-            cols = st.columns(min(5, len(days)))
-            for i, c in enumerate(cols):
-                with c:
-                    st.markdown(f"**{days[i][5:]}**")
-                    st.write(f"{round(wx['daily']['temperature_2m_max'][i])}° / {round(wx['daily']['temperature_2m_min'][i])}°")
         except Exception:
             st.error("天氣資料取得失敗，請檢查網路連線")
     else:
         st.info("正在等待瀏覽器定位授權，請允許位置權限（若手機沒反應，重新整理頁面再試一次）。")
-
-with st.expander("❄️ 澳洲 8 月冬季氣候參考"):
-    st.markdown(
-        "- **墨爾本**：8°C - 14°C 🌧️（濕冷多雨，務必帶防風厚外套與雨傘）\n"
-        "- **雪梨**：10°C - 17°C ⛅（氣候舒適，早晚偏冷）\n"
-        "- **布里斯本/黃金海岸**：11°C - 22°C ☀️（溫暖晴朗，防曬必備）"
-    )
 
 with st.sidebar:
     st.markdown("### 🦘 澳洲旅程助手")
@@ -196,7 +215,7 @@ with st.sidebar:
 # ==========================================
 # 主分頁
 # ==========================================
-tabs = st.tabs(["📅 行程", "✈️ 航班", "🚗 租車", "🏨 飯店", "🧳 行李"])
+tabs = st.tabs(["📅 行程", "✈️ 航班", "🚗 租車", "🏨 飯店", "🧳 行李", "📌 旅行提醒"])
 
 # ------------------------------------------
 # 📅 行程
@@ -663,3 +682,15 @@ with tabs[4]:
                 row.append("✅" if checks.get(it, {}).get(m, False) else "")
             table_md += "| " + " | ".join(row) + " |\n"
         st.markdown(table_md)
+
+# ------------------------------------------
+# 📌 旅行提醒
+# ------------------------------------------
+with tabs[5]:
+    st.subheader("📌 旅行提醒")
+    st.markdown("##### ❄️ 澳洲 8 月冬季氣候參考")
+    st.markdown(
+        "- **墨爾本**：8°C - 14°C 🌧️（濕冷多雨，務必帶防風厚外套與雨傘）\n"
+        "- **雪梨**：10°C - 17°C ⛅（氣候舒適，早晚偏冷）\n"
+        "- **布里斯本/黃金海岸**：11°C - 22°C ☀️（溫暖晴朗，防曬必備）"
+    )
