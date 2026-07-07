@@ -56,6 +56,12 @@ def maps_link(query):
     from urllib.parse import quote
     return f"https://www.google.com/maps/dir/?api=1&destination={quote(query)}"
 
+def md(html):
+    """st.markdown for HTML blocks - strips per-line indentation so Streamlit
+    doesn't mistake indented lines for a Markdown code block."""
+    cleaned = "\n".join(line.strip() for line in html.strip("\n").split("\n"))
+    st.markdown(cleaned, unsafe_allow_html=True)
+
 # ==========================================
 # 1. 網頁基本設定
 # ==========================================
@@ -156,14 +162,11 @@ with tabs[0]:
         if not show:
             return
         with st.expander(title, expanded=False):
-            st.markdown(
-                f"""<div class="timeline-container">
+            md(f"""<div class="timeline-container">
                 <span class="timeline-tag-hotel">🏠 {hotel}</span>
                 <span class="{car_tag[0]}">{car_tag[1]}</span>
                 {body_html}
-                </div>""",
-                unsafe_allow_html=True,
-            )
+                </div>""")
 
     day_card(
         "📅 7/30 (四) Day 1：凌晨出發，新加坡轉機一日遊 ✈️",
@@ -461,8 +464,7 @@ with tabs[1]:
 # ------------------------------------------
 with tabs[2]:
     st.subheader("🚗 租車自駕日程與車輛分配")
-    st.markdown(
-        """
+    md("""
         <div class="travel-card">
             <div class="alert-card-success"><strong>🚗 澳洲用車清單（全程共需 2 台中大型休旅車）</strong></div>
             <p><strong>第一段：墨爾本（彩虹小屋、蒸汽火車、菲利普島、大洋路）</strong></p>
@@ -479,11 +481,8 @@ with tabs[2]:
             </ul>
             <p><strong>⚠️ 自駕必備文件</strong>：台灣駕照正本、英文版國際駕照正本、主駕駛人信用卡、護照正本</p>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    st.markdown(
-        """
+        """)
+    md("""
         <div class="travel-card">
             <div class="alert-card-info"><strong>🚨 靠左行駛！澳洲自駕安全守則</strong></div>
             <ol>
@@ -494,9 +493,7 @@ with tabs[2]:
                 <li>黃昏與夜間郊區道路盡量避免駕駛，留意野生動物衝出。</li>
             </ol>
         </div>
-        """,
-        unsafe_allow_html=True,
-    )
+        """)
 
 # ------------------------------------------
 # 🏨 飯店
@@ -511,17 +508,14 @@ with tabs[3]:
         ("布里斯本喬治飯店 (George Hotel Brisbane)", "8/9 入住 ～ 8/11 退房（2晚）", "345 George St, Brisbane City QLD 4000", "+61-7-3221-1111"),
     ]
     for name, dates, addr, phone in HOTELS:
-        st.markdown(
-            f"""
+        md(f"""
             <div class="travel-card">
                 <div class="alert-card-info"><strong>🏨 {name}</strong></div>
                 <p><strong>住退日期</strong>：{dates}{'　<strong>電話</strong>：' + phone if phone else ''}</p>
                 <p>📍 {addr}</p>
                 <a href="{maps_link(addr)}" target="_blank" class="map-btn">📍 Google地圖導航</a>
             </div>
-            """,
-            unsafe_allow_html=True,
-        )
+            """)
 
 # ------------------------------------------
 # ☀️ 天氣
@@ -551,14 +545,11 @@ with tabs[4]:
                     timeout=8,
                 ).json()
                 cw = wx["current_weather"]
-                st.markdown(
-                    f"""<div class="weather-now">
+                md(f"""<div class="weather-now">
                     <div>{city} {('· ' + country) if country else ''}</div>
                     <div class="temp">{round(cw['temperature'])}°C</div>
                     <div>風速 {cw['windspeed']} km/h</div>
-                    </div>""",
-                    unsafe_allow_html=True,
-                )
+                    </div>""")
                 days = wx["daily"]["time"]
                 cols = st.columns(min(5, len(days)))
                 for i, c in enumerate(cols):
@@ -573,11 +564,9 @@ with tabs[4]:
     st.write("---")
     st.markdown("##### ❄️ 澳洲 8 月冬季氣候參考")
     st.markdown(
-        """
-        - **墨爾本**：8°C - 14°C 🌧️（濕冷多雨，務必帶防風厚外套與雨傘）
-        - **雪梨**：10°C - 17°C ⛅（氣候舒適，早晚偏冷）
-        - **布里斯本/黃金海岸**：11°C - 22°C ☀️（溫暖晴朗，防曬必備）
-        """
+        "- **墨爾本**：8°C - 14°C 🌧️（濕冷多雨，務必帶防風厚外套與雨傘）\n"
+        "- **雪梨**：10°C - 17°C ⛅（氣候舒適，早晚偏冷）\n"
+        "- **布里斯本/黃金海岸**：11°C - 22°C ☀️（溫暖晴朗，防曬必備）"
     )
 
 # ------------------------------------------
@@ -600,6 +589,42 @@ with tabs[5]:
             packing["current"] = new_name.strip()
             persist()
             st.rerun()
+
+    with st.expander("⚙️ 管理家人名單（改名 / 刪除）"):
+        for m in list(packing["members"]):
+            c1, c2, c3 = st.columns([2, 2, 1])
+            with c1:
+                st.write(m)
+            with c2:
+                renamed = st.text_input("改名為", value="", key=f"rename_{m}", label_visibility="collapsed", placeholder="輸入新名字")
+            with c3:
+                disabled = len(packing["members"]) <= 1
+                if st.button("🗑️ 刪除", key=f"del_{m}", disabled=disabled):
+                    packing["members"].remove(m)
+                    for it in packing["checks"].values():
+                        it.pop(m, None)
+                    for fp in store["flight_pax"].values():
+                        fp.pop(m, None)
+                    if packing["current"] == m:
+                        packing["current"] = packing["members"][0]
+                    persist()
+                    st.rerun()
+            if renamed.strip() and renamed.strip() != m:
+                if renamed.strip() not in packing["members"]:
+                    idx = packing["members"].index(m)
+                    packing["members"][idx] = renamed.strip()
+                    for it in packing["checks"].values():
+                        if m in it:
+                            it[renamed.strip()] = it.pop(m)
+                    for fp in store["flight_pax"].values():
+                        if m in fp:
+                            fp[renamed.strip()] = fp.pop(m)
+                    if packing["current"] == m:
+                        packing["current"] = renamed.strip()
+                    persist()
+                    st.rerun()
+        if len(packing["members"]) <= 1:
+            st.caption("至少要保留一位家人，無法刪除最後一位。")
 
     st.write("---")
     checks = packing["checks"]
