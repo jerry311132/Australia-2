@@ -65,7 +65,7 @@ def md(html):
 # ==========================================
 # 1. 網頁基本設定
 # ==========================================
-st.set_page_config(page_title="2026 澳洲自駕隨身手冊 🦘", page_icon="🦘", layout="centered")
+st.set_page_config(page_title="2026 澳洲 GO GO 🦘", page_icon="🦘", layout="centered")
 
 custom_css = """
 <style>
@@ -119,15 +119,67 @@ div[data-testid="stConnectionStatus"] {display: none;}
 st.markdown(custom_css, unsafe_allow_html=True)
 
 st.markdown(
-    """<div class="hero-banner"><h1>🇦🇺 2026 澳洲自駕隨身手冊</h1>
+    """<div class="hero-banner"><h1>🇦🇺 2026 澳洲 GO GO</h1>
     <p>📱 全家共用行動版</p></div>""",
     unsafe_allow_html=True,
 )
 
+# ==========================================
+# 頂部：今天日期 + 目前所在地天氣（一打開就看到）
+# ==========================================
+today = datetime.date.today()
+weekday_zh = ["一", "二", "三", "四", "五", "六", "日"][today.weekday()]
+st.markdown(f"#### 📆 今天是 {today.strftime('%Y/%m/%d')}（星期{weekday_zh}）")
+
+if get_geolocation is None:
+    st.warning("需要安裝 streamlit-js-eval 套件才能自動定位（requirements.txt 已包含）。")
+else:
+    loc = get_geolocation()
+    if loc and "coords" in loc:
+        lat = loc["coords"]["latitude"]
+        lon = loc["coords"]["longitude"]
+        try:
+            geo = requests.get(
+                f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat}&longitude={lon}&localityLanguage=zh",
+                timeout=8,
+            ).json()
+            city = geo.get("city") or geo.get("locality") or "目前位置"
+            country = geo.get("countryName", "")
+        except Exception:
+            city, country = "目前位置", ""
+
+        try:
+            wx = requests.get(
+                f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto",
+                timeout=8,
+            ).json()
+            cw = wx["current_weather"]
+            md(f"""<div class="weather-now">
+                <div>{city} {('· ' + country) if country else ''}</div>
+                <div class="temp">{round(cw['temperature'])}°C</div>
+                <div>風速 {cw['windspeed']} km/h</div>
+                </div>""")
+            days = wx["daily"]["time"]
+            cols = st.columns(min(5, len(days)))
+            for i, c in enumerate(cols):
+                with c:
+                    st.markdown(f"**{days[i][5:]}**")
+                    st.write(f"{round(wx['daily']['temperature_2m_max'][i])}° / {round(wx['daily']['temperature_2m_min'][i])}°")
+        except Exception:
+            st.error("天氣資料取得失敗，請檢查網路連線")
+    else:
+        st.info("正在等待瀏覽器定位授權，請允許位置權限（若手機沒反應，重新整理頁面再試一次）。")
+
+with st.expander("❄️ 澳洲 8 月冬季氣候參考"):
+    st.markdown(
+        "- **墨爾本**：8°C - 14°C 🌧️（濕冷多雨，務必帶防風厚外套與雨傘）\n"
+        "- **雪梨**：10°C - 17°C ⛅（氣候舒適，早晚偏冷）\n"
+        "- **布里斯本/黃金海岸**：11°C - 22°C ☀️（溫暖晴朗，防曬必備）"
+    )
+
 with st.sidebar:
     st.markdown("### 🦘 澳洲旅程助手")
     departure_date = datetime.date(2026, 7, 30)
-    today = datetime.date.today()
     days_left = (departure_date - today).days
     if days_left > 0:
         st.metric(label="✈️ 距離出發還有", value=f"{days_left} 天")
@@ -144,7 +196,7 @@ with st.sidebar:
 # ==========================================
 # 主分頁
 # ==========================================
-tabs = st.tabs(["📅 行程", "✈️ 航班", "🚗 租車", "🏨 飯店", "☀️ 天氣", "🧳 行李"])
+tabs = st.tabs(["📅 行程", "✈️ 航班", "🚗 租車", "🏨 飯店", "🧳 行李"])
 
 # ------------------------------------------
 # 📅 行程
@@ -518,61 +570,9 @@ with tabs[3]:
             """)
 
 # ------------------------------------------
-# ☀️ 天氣
-# ------------------------------------------
-with tabs[4]:
-    st.subheader("☀️ 目前所在地天氣")
-    if get_geolocation is None:
-        st.warning("需要安裝 streamlit-js-eval 套件才能自動定位（requirements.txt 已包含）。")
-    else:
-        loc = get_geolocation()
-        if loc and "coords" in loc:
-            lat = loc["coords"]["latitude"]
-            lon = loc["coords"]["longitude"]
-            try:
-                geo = requests.get(
-                    f"https://api.bigdatacloud.net/data/reverse-geocode-client?latitude={lat}&longitude={lon}&localityLanguage=zh",
-                    timeout=8,
-                ).json()
-                city = geo.get("city") or geo.get("locality") or "目前位置"
-                country = geo.get("countryName", "")
-            except Exception:
-                city, country = "目前位置", ""
-
-            try:
-                wx = requests.get(
-                    f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current_weather=true&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=auto",
-                    timeout=8,
-                ).json()
-                cw = wx["current_weather"]
-                md(f"""<div class="weather-now">
-                    <div>{city} {('· ' + country) if country else ''}</div>
-                    <div class="temp">{round(cw['temperature'])}°C</div>
-                    <div>風速 {cw['windspeed']} km/h</div>
-                    </div>""")
-                days = wx["daily"]["time"]
-                cols = st.columns(min(5, len(days)))
-                for i, c in enumerate(cols):
-                    with c:
-                        st.markdown(f"**{days[i][5:]}**")
-                        st.write(f"{round(wx['daily']['temperature_2m_max'][i])}° / {round(wx['daily']['temperature_2m_min'][i])}°")
-            except Exception:
-                st.error("天氣資料取得失敗，請檢查網路連線")
-        else:
-            st.info("正在等待瀏覽器定位授權，請允許位置權限（若手機沒反應，重新整理頁面再試一次）。")
-
-    st.write("---")
-    st.markdown("##### ❄️ 澳洲 8 月冬季氣候參考")
-    st.markdown(
-        "- **墨爾本**：8°C - 14°C 🌧️（濕冷多雨，務必帶防風厚外套與雨傘）\n"
-        "- **雪梨**：10°C - 17°C ⛅（氣候舒適，早晚偏冷）\n"
-        "- **布里斯本/黃金海岸**：11°C - 22°C ☀️（溫暖晴朗，防曬必備）"
-    )
-
-# ------------------------------------------
 # 🧳 行李
 # ------------------------------------------
-with tabs[5]:
+with tabs[4]:
     st.subheader("🧳 行李打包清單")
     packing = store["packing"]
 
