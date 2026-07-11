@@ -605,52 +605,67 @@ elif active == "✈️ 航班":
         st.rerun()
     st.caption("布里斯本 → 台北（長榮航空）座位與餐食尚未提供，請自行填寫。")
 
+    if "open_flight" not in st.session_state:
+        st.session_state.open_flight = None
+
     for fl in FLIGHTS:
-        with st.expander(f"{fl['label']}　{fl['date']}", expanded=False):
-            st.markdown(f"**出發**：{fl['dep']}　→　**抵達**：{fl['arr']}")
-            info_bits = []
-            if fl.get("airline"):
-                info_bits.append(f"✈️ {fl['airline']}")
-            if fl.get("baggage"):
-                info_bits.append(f"🧳 {fl['baggage']}")
-            if info_bits:
-                st.markdown("　｜　".join(info_bits))
-            if fl.get("note"):
-                st.info(fl["note"])
-            fl_pax = store["flight_pax"].setdefault(fl["id"], {})
-            cols = st.columns(len(store["packing"]["members"]) or 1)
-            for i, person in enumerate(store["packing"]["members"]):
-                with cols[i]:
-                    st.markdown(f"**{person}**")
-                    existing = fl_pax.get(person, {"seat": "", "meal": ""})
-                    seat = st.text_input("座位", value=existing.get("seat", ""), key=f"{fl['id']}_seat_{person}")
-                    meal = st.text_input("餐食", value=existing.get("meal", ""), key=f"{fl['id']}_meal_{person}")
-                    fl_pax[person] = {"seat": seat, "meal": meal}
-            persist()
+        is_open = st.session_state.open_flight == fl["id"]
+        icon = "🔽" if is_open else "▶️"
+        if st.button(f"{icon}  {fl['label']}　{fl['date']}", key=f"flightbtn_{fl['id']}", use_container_width=True):
+            st.session_state.open_flight = None if is_open else fl["id"]
+            st.rerun()
+
+        if not is_open:
+            continue
+
+        st.markdown(f"**出發**：{fl['dep']}　→　**抵達**：{fl['arr']}")
+        info_bits = []
+        if fl.get("airline"):
+            info_bits.append(f"✈️ {fl['airline']}")
+        if fl.get("baggage"):
+            info_bits.append(f"🧳 {fl['baggage']}")
+        if info_bits:
+            st.markdown("　｜　".join(info_bits))
+        if fl.get("note"):
+            st.info(fl["note"])
+        fl_pax = store["flight_pax"].setdefault(fl["id"], {})
+        cols = st.columns(len(store["packing"]["members"]) or 1)
+        for i, person in enumerate(store["packing"]["members"]):
+            with cols[i]:
+                st.markdown(f"**{person}**")
+                existing = fl_pax.get(person, {"seat": "", "meal": ""})
+                seat = st.text_input("座位", value=existing.get("seat", ""), key=f"{fl['id']}_seat_{person}")
+                meal = st.text_input("餐食", value=existing.get("meal", ""), key=f"{fl['id']}_meal_{person}")
+                fl_pax[person] = {"seat": seat, "meal": meal}
+        persist()
+        st.write("---")
 
 # ------------------------------------------
 # 🚗 租車
 # ------------------------------------------
 elif active == "🚗 租車":
     st.subheader("🚗 租車自駕日程與車輛分配")
-    md("""
+    md(f"""
         <div class="travel-card">
             <div class="alert-card-success"><strong>🚗 澳洲用車清單（墨爾本段 2～3 台，布里斯本段 2 台）</strong></div>
             <p><strong>第一段：墨爾本（彩虹小屋、蒸汽火車、菲利普島、大洋路）</strong></p>
             <ul>
-                <li><strong>8/2 (日) 08:00</strong>：先租 2 台（不用載行李，去玩普芬比利火車、彩虹小屋、企鵝歸巢）</li>
+                <li><strong>取車（前 2 台）</strong>：Sun, Aug 02 2026　8:00 AM</li>
+                <li><strong>取車地點</strong>：Coburg (AU)　152A Gaffney Street, 3058 Coburg（不用載行李，去玩普芬比利火車、彩虹小屋、企鵝歸巢）</li>
                 <li><strong>8/3 (一) 08:00</strong>：加租第 3 台（要載行李出發大洋路），共 3 台</li>
-                <li><strong>8/4 (二) 14:00</strong>：3 台一起在阿瓦隆機場 (Avalon Airport, AVV) 還車</li>
-                <li><strong>取車點</strong>：墨爾本市區　<strong>還車點</strong>：阿瓦隆機場 (AVV)</li>
+                <li><strong>還車（3 台）</strong>：Tue, Aug 04 2026　3:00 PM</li>
+                <li><strong>還車地點</strong>：阿瓦隆機場 Avalon Airport (AVV)</li>
                 <li><strong>車輛配置</strong>：5-7人座 SUV</li>
             </ul>
+            <a href="{maps_link('152A Gaffney Street, 3058 Coburg, Australia')}" target="_blank" class="map-btn">📍 Coburg 取車點導航</a>
+            <a href="{maps_link('Avalon Airport AVV')}" target="_blank" class="map-btn">📍 阿瓦隆機場還車點導航</a>
             <p><strong>第二段：布里斯本（龍柏無尾熊動物園、庫薩山觀景）</strong></p>
             <ul>
                 <li><strong>用車時間</strong>：8/10 (一) 08:30 ～ 8/10 (一) 18:30 當日還車</li>
                 <li><strong>取還車點</strong>：布里斯本市區營業所同點取還</li>
                 <li><strong>車輛配置</strong>：2 台中型 SUV</li>
             </ul>
-            <p><strong>⚠️ 自駕必備文件</strong>：台灣駕照正本、英文版國際駕照正本、主駕駛人信用卡、護照正本</p>
+            <p><strong>⚠️ 自駕必備文件</strong>：台灣駕照正本、國際駕照、NAATI 駕照譯本、駕駛本人名字的信用卡、護照正本</p>
         </div>
         """)
     md("""
