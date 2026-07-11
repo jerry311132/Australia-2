@@ -94,9 +94,10 @@ html, body, .stApp {
     background-color: #e3f0fb !important;
 }
 iframe { height: 0px !important; min-height: 0px !important; border: none !important; }
-.date-row { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: nowrap; margin-bottom: 10px; }
-.date-row .d-main { font-size: 1.3rem; font-weight: 700; white-space: nowrap; }
-.date-row .d-week { font-size: 1rem; color: #6b7785; white-space: nowrap; }
+div[data-testid="stButton"] button p { text-align: left !important; }
+div[data-testid="stButton"] button div { justify-content: flex-start !important; }
+.date-row { margin-bottom: 10px; overflow-x: auto; }
+.date-row .d-line { font-size: clamp(1rem, 5vw, 1.3rem); font-weight: 700; white-space: nowrap; }
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
@@ -158,8 +159,7 @@ st.markdown(
 today = datetime.date.today()
 weekday_zh = ["一", "二", "三", "四", "五", "六", "日"][today.weekday()]
 md(f"""<div class="date-row">
-    <span class="d-main">📆 今天是 {today.strftime('%Y/%m/%d')}</span>
-    <span class="d-week">星期{weekday_zh}</span>
+    <span class="d-line">📆 今天是 {today.strftime('%Y/%m/%d')}（星期{weekday_zh}）</span>
     </div>""")
 
 if get_geolocation is None:
@@ -238,11 +238,19 @@ if active == "📅 行程":
         default="全部天數",
     )
 
+    if "open_day" not in st.session_state:
+        st.session_state.open_day = None
+
     def day_card(title, expanded, hotel, car_tag, body_html):
         show = area_sel == "全部天數" or expanded[1]
         if not show:
             return
-        with st.expander(title, expanded=False):
+        is_open = st.session_state.open_day == title
+        icon = "🔽" if is_open else "▶️"
+        if st.button(f"{icon}  {title}", key=f"daybtn_{title}", use_container_width=True):
+            st.session_state.open_day = None if is_open else title
+            st.rerun()
+        if is_open:
             md(f"""<div class="timeline-container">
                 <span class="timeline-tag-hotel">🏠 {hotel}</span>
                 <span class="{car_tag[0]}">{car_tag[1]}</span>
@@ -523,27 +531,100 @@ elif active == "✈️ 航班":
     st.caption("點開每個航班可以幫每位家人填座位與餐食，資料會自動存檔")
 
     FLIGHTS = [
-        {"id": "f1", "label": "台北 → 新加坡", "date": "2026-07-30", "dep": "台北桃園 TPE T1　01:35", "arr": "新加坡樟宜 SIN T1　06:00"},
-        {"id": "f2", "label": "新加坡 → 墨爾本", "date": "2026-07-31", "dep": "新加坡樟宜 SIN T1　02:30", "arr": "墨爾本塔拉瑪琳 MEL T2　11:45"},
-        {"id": "f3", "label": "墨爾本(阿瓦隆) → 雪梨（國內線）", "date": "2026-08-04", "dep": "阿瓦隆機場 AVV　16:40", "arr": "雪梨 SYD　18:10"},
-        {"id": "f4", "label": "雪梨 → 黃金海岸（國內線）", "date": "2026-08-08", "dep": "雪梨 SYD　12:20", "arr": "黃金海岸 OOL　13:40"},
-        {"id": "f5", "label": "布里斯本 → 台北", "date": "2026-08-11", "dep": "布里斯本機場　22:15", "arr": "台北桃園 TPE T2　次日05:10"},
+        {"id": "f1", "label": "台北 → 新加坡", "date": "2026-07-30",
+         "dep": "台北桃園 TPE 第一航廈　01:35", "arr": "新加坡樟宜 SIN 第一航廈　06:00",
+         "airline": "酷航 Scoot", "baggage": "托運行李 1 件 30 公斤，手提行李 1 件 7 公斤", "note": ""},
+        {"id": "f2", "label": "新加坡 → 墨爾本", "date": "2026-07-31",
+         "dep": "新加坡樟宜 SIN 第一航廈　02:30", "arr": "墨爾本塔拉瑪琳 MEL T2　11:45",
+         "airline": "酷航 Scoot", "baggage": "托運行李 1 件 30 公斤，手提行李 1 件 7 公斤", "note": ""},
+        {"id": "f3", "label": "墨爾本(阿瓦隆) → 雪梨（國內線）", "date": "2026-08-04",
+         "dep": "阿瓦隆機場 AVV，航廈D　16:40", "arr": "雪梨 SYD　18:10",
+         "airline": "捷星航空 Jetstar", "baggage": "托運行李 1 件 20 公斤，手提行李 1 件 7 公斤",
+         "note": "🎟️ 每人有 AU$10 機上禮券，可在飛機上點餐飲"},
+        {"id": "f4", "label": "雪梨 → 黃金海岸（國內線）", "date": "2026-08-08",
+         "dep": "雪梨 SYD 第二航廈　12:20", "arr": "黃金海岸 OOL　13:40",
+         "airline": "捷星航空 Jetstar", "baggage": "托運行李 1 件 20 公斤，手提行李 1 件 7 公斤",
+         "note": "🎟️ 每人有 AU$10 機上禮券，可在飛機上點餐飲"},
+        {"id": "f5", "label": "布里斯本 → 台北", "date": "2026-08-11",
+         "dep": "布里斯本機場　22:15", "arr": "台北桃園 TPE T2　次日05:10",
+         "airline": "長榮航空 EVA Air", "baggage": "", "note": ""},
     ]
-    MEAL_OPTIONS = ["（未選）", "一般餐", "兒童餐", "素食餐", "海鮮餐", "其他"]
+
+    DEFAULT_FLIGHT_PAX = {
+        "f1": {
+            "政憲": {"seat": "1A", "meal": "牛肉煙燻火腿佛卡夏"},
+            "秀英": {"seat": "1C", "meal": "咖哩雞肉香飯"},
+            "芍慧": {"seat": "3C", "meal": "蔬菜青醬捲餅"},
+            "Tiana": {"seat": "2A", "meal": "咖哩雞肉香飯"},
+            "小趙": {"seat": "2C", "meal": "零食包"},
+            "哲安": {"seat": "3A", "meal": "咖哩雞肉香飯"},
+            "鶴年": {"seat": "31H", "meal": ""},
+            "禹喬": {"seat": "31J", "meal": ""},
+            "禹倩": {"seat": "31K", "meal": ""},
+        },
+        "f2": {
+            "政憲": {"seat": "1H", "meal": "紐約客牛排配蒜香炒飯"},
+            "秀英": {"seat": "1K", "meal": "烤雞飯"},
+            "芍慧": {"seat": "4H", "meal": "番茄海鮮義大利麵"},
+            "Tiana": {"seat": "2K", "meal": "招牌叻沙"},
+            "小趙": {"seat": "2H", "meal": "紐約客牛排配蒜香炒飯"},
+            "哲安": {"seat": "4K", "meal": "日式牛丼配紅生薑"},
+            "鶴年": {"seat": "36H", "meal": ""},
+            "禹喬": {"seat": "36J", "meal": ""},
+            "禹倩": {"seat": "36K", "meal": ""},
+        },
+        "f3": {
+            "政憲": {"seat": "7A", "meal": ""},
+            "秀英": {"seat": "7C", "meal": ""},
+            "芍慧": {"seat": "8C", "meal": ""},
+            "Tiana": {"seat": "8F", "meal": ""},
+            "小趙": {"seat": "8D", "meal": ""},
+            "哲安": {"seat": "8A", "meal": ""},
+            "鶴年": {"seat": "7D", "meal": ""},
+            "禹喬": {"seat": "7E", "meal": ""},
+            "禹倩": {"seat": "7F", "meal": ""},
+        },
+        "f4": {
+            "政憲": {"seat": "8A", "meal": ""},
+            "秀英": {"seat": "8C", "meal": ""},
+            "芍慧": {"seat": "9C", "meal": ""},
+            "Tiana": {"seat": "9D", "meal": ""},
+            "小趙": {"seat": "9F", "meal": ""},
+            "哲安": {"seat": "9A", "meal": ""},
+            "鶴年": {"seat": "8D", "meal": ""},
+            "禹喬": {"seat": "8E", "meal": ""},
+            "禹倩": {"seat": "8F", "meal": ""},
+        },
+    }
+
+    if st.button("🔄 帶入已知的座位／餐點資料（覆蓋目前填寫）"):
+        for fid, pax in DEFAULT_FLIGHT_PAX.items():
+            store["flight_pax"][fid] = {p: dict(v) for p, v in pax.items()}
+        persist()
+        st.success("已帶入航班 1～4 的座位與餐食資料！")
+        st.rerun()
+    st.caption("布里斯本 → 台北（長榮航空）座位與餐食尚未提供，請自行填寫。")
 
     for fl in FLIGHTS:
         with st.expander(f"{fl['label']}　{fl['date']}", expanded=False):
             st.markdown(f"**出發**：{fl['dep']}　→　**抵達**：{fl['arr']}")
+            info_bits = []
+            if fl.get("airline"):
+                info_bits.append(f"✈️ {fl['airline']}")
+            if fl.get("baggage"):
+                info_bits.append(f"🧳 {fl['baggage']}")
+            if info_bits:
+                st.markdown("　｜　".join(info_bits))
+            if fl.get("note"):
+                st.info(fl["note"])
             fl_pax = store["flight_pax"].setdefault(fl["id"], {})
             cols = st.columns(len(store["packing"]["members"]) or 1)
             for i, person in enumerate(store["packing"]["members"]):
                 with cols[i]:
                     st.markdown(f"**{person}**")
-                    existing = fl_pax.get(person, {"seat": "", "meal": "（未選）"})
+                    existing = fl_pax.get(person, {"seat": "", "meal": ""})
                     seat = st.text_input("座位", value=existing.get("seat", ""), key=f"{fl['id']}_seat_{person}")
-                    meal = st.selectbox("餐食", MEAL_OPTIONS,
-                                         index=MEAL_OPTIONS.index(existing.get("meal", "（未選）")) if existing.get("meal", "（未選）") in MEAL_OPTIONS else 0,
-                                         key=f"{fl['id']}_meal_{person}")
+                    meal = st.text_input("餐食", value=existing.get("meal", ""), key=f"{fl['id']}_meal_{person}")
                     fl_pax[person] = {"seat": seat, "meal": meal}
             persist()
 
