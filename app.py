@@ -629,15 +629,34 @@ elif active == "✈️ 航班":
         if fl.get("note"):
             st.info(fl["note"])
         fl_pax = store["flight_pax"].setdefault(fl["id"], {})
-        cols = st.columns(len(store["packing"]["members"]) or 1)
-        for i, person in enumerate(store["packing"]["members"]):
-            with cols[i]:
-                st.markdown(f"**{person}**")
+        edit_key = f"editing_flight_{fl['id']}"
+        if edit_key not in st.session_state:
+            st.session_state[edit_key] = False
+
+        if not st.session_state[edit_key]:
+            lines = []
+            for person in store["packing"]["members"]:
                 existing = fl_pax.get(person, {"seat": "", "meal": ""})
-                seat = st.text_input("座位", value=existing.get("seat", ""), key=f"{fl['id']}_seat_{person}")
-                meal = st.text_input("餐食", value=existing.get("meal", ""), key=f"{fl['id']}_meal_{person}")
-                fl_pax[person] = {"seat": seat, "meal": meal}
-        persist()
+                detail = "／".join([x for x in [existing.get("seat", ""), existing.get("meal", "")] if x])
+                lines.append(f"- **{person}**：{detail if detail else '尚未填寫'}")
+            st.markdown("\n".join(lines))
+            if st.button("✏️ 修改座位與餐食", key=f"editbtn_{fl['id']}"):
+                st.session_state[edit_key] = True
+                st.rerun()
+        else:
+            cols = st.columns(len(store["packing"]["members"]) or 1)
+            for i, person in enumerate(store["packing"]["members"]):
+                with cols[i]:
+                    st.markdown(f"**{person}**")
+                    existing = fl_pax.get(person, {"seat": "", "meal": ""})
+                    seat = st.text_input("座位", value=existing.get("seat", ""), key=f"{fl['id']}_seat_{person}")
+                    meal = st.text_input("餐食", value=existing.get("meal", ""), key=f"{fl['id']}_meal_{person}")
+                    fl_pax[person] = {"seat": seat, "meal": meal}
+            if st.button("💾 儲存", key=f"savebtn_{fl['id']}"):
+                persist()
+                st.session_state[edit_key] = False
+                st.success("已儲存！")
+                st.rerun()
         st.write("---")
 
 # ------------------------------------------
@@ -648,6 +667,7 @@ elif active == "🚗 租車":
     md(f"""
         <div class="travel-card">
             <div class="alert-card-success"><strong>🚗 澳洲用車清單（墨爾本段 2～3 台，布里斯本段 2 台）</strong></div>
+            <p><strong>⚠️ 自駕必備文件</strong>：台灣駕照正本、國際駕照、NAATI 駕照譯本、駕駛本人名字的信用卡、護照正本</p>
             <p><strong>第一段：墨爾本（彩虹小屋、蒸汽火車、菲利普島、大洋路）</strong></p>
             <ul>
                 <li><strong>取車（前 2 台）</strong>：Sun, Aug 02 2026　8:00 AM</li>
@@ -665,7 +685,6 @@ elif active == "🚗 租車":
                 <li><strong>取還車點</strong>：布里斯本市區營業所同點取還</li>
                 <li><strong>車輛配置</strong>：2 台中型 SUV</li>
             </ul>
-            <p><strong>⚠️ 自駕必備文件</strong>：台灣駕照正本、國際駕照、NAATI 駕照譯本、駕駛本人名字的信用卡、護照正本</p>
         </div>
         """)
     md("""
