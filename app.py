@@ -14,11 +14,13 @@ DATA_FILE = os.path.join(os.path.dirname(__file__), "trip_data.json")
 # ==========================================
 # 0. 本地資料儲存（家人共用，存在伺服器端 JSON）
 # ==========================================
+DEFAULT_MEMBERS = ["政憲", "秀英", "芍慧", "Tiana", "小趙", "哲安", "鶴年", "禹喬", "禹倩"]
+
 def default_store():
     return {
         "packing": {
-            "members": ["爸爸", "媽媽"],
-            "current": "爸爸",
+            "members": list(DEFAULT_MEMBERS),
+            "current": DEFAULT_MEMBERS[0],
             "items": [
                 "護照 / 簽證", "手機充電器", "轉接頭（澳洲插座）", "防曬乳",
                 "常備藥品", "台灣駕照正本 + 國際駕照", "保暖外套（8月為冬季）",
@@ -89,8 +91,12 @@ custom_css = """
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=Outfit:wght@300;400;500;600;700&display=swap');
 html, body, .stApp {
     font-family: 'Outfit', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif !important;
-    background-color: #f7f9fa !important;
+    background-color: #e3f0fb !important;
 }
+iframe { height: 0px !important; min-height: 0px !important; border: none !important; }
+.date-row { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: nowrap; margin-bottom: 10px; }
+.date-row .d-main { font-size: 1.3rem; font-weight: 700; white-space: nowrap; }
+.date-row .d-week { font-size: 1rem; color: #6b7785; white-space: nowrap; }
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
 header {visibility: hidden;}
@@ -100,7 +106,7 @@ div[data-testid="stConnectionStatus"] {display: none;}
     color: white; padding: 30px 25px; border-radius: 20px; margin-bottom: 25px;
     box-shadow: 0 10px 25px rgba(10, 147, 150, 0.15); text-align: center;
 }
-.hero-banner h1 { font-size: 2.1rem !important; font-weight: 700 !important; margin: 0 !important; color: white !important; }
+.hero-banner h1 { font-size: clamp(1.3rem, 7.5vw, 2.1rem) !important; font-weight: 700 !important; margin: 0 !important; color: white !important; white-space: nowrap; }
 .hero-banner p { font-size: 0.95rem !important; margin: 8px 0 0 0 !important; opacity: 0.95; font-weight: 500; }
 .travel-card {
     background: rgba(255, 255, 255, 0.95) !important; border-radius: 16px !important; padding: 22px !important;
@@ -128,12 +134,12 @@ div[data-testid="stConnectionStatus"] {display: none;}
 .map-btn { display: inline-flex; align-items: center; background-color: #ffffff; color: #ca6702; border: 1px solid #ca6702; border-radius: 20px; padding: 3px 12px; font-size: 0.8rem; font-weight: bold; text-decoration: none; margin-top: 8px; }
 .alert-card-info { background: linear-gradient(135deg, rgba(10, 147, 150, 0.08) 0%, rgba(0, 95, 115, 0.08) 100%); border-left: 5px solid #0a9396; color: #005f73; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
 .alert-card-success { background: linear-gradient(135deg, rgba(56, 161, 105, 0.08) 0%, rgba(47, 133, 90, 0.08) 100%); border-left: 5px solid #38a169; color: #22543d; padding: 15px; border-radius: 12px; margin-bottom: 15px; }
-.weather-card { background: #ffffff; border-radius: 20px; padding: 16px 20px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 16px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); }
+.weather-card { background: #f2f8f5; border-radius: 20px; padding: 16px 20px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 6px 16px rgba(0,0,0,0.05); border: 1px solid rgba(0,0,0,0.03); }
 .weather-left { display: flex; align-items: center; gap: 14px; }
-.weather-icon-box { width: 46px; height: 46px; border-radius: 14px; background: #e9f3ea; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #4a9c4f; flex-shrink: 0; }
-.weather-label { font-size: 0.78rem; color: #a19b8f; margin-bottom: 2px; }
+.weather-icon-box { width: 46px; height: 46px; border-radius: 14px; background: #dcecdf; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #4a9c4f; flex-shrink: 0; }
+.weather-label { font-size: 0.78rem; color: #8b968f; margin-bottom: 2px; }
 .weather-city { font-size: 1.25rem; font-weight: 700; color: #3d3229; }
-.weather-temp-box { background: #f4f2ee; border-radius: 14px; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
+.weather-temp-box { background: #e6f0ea; border-radius: 14px; padding: 10px 16px; display: flex; align-items: center; gap: 8px; }
 .weather-temp-num { font-size: 1.5rem; font-weight: 700; color: #4a9c4f; }
 .weather-temp-icon { font-size: 1.4rem; }
 </style>
@@ -151,7 +157,10 @@ st.markdown(
 # ==========================================
 today = datetime.date.today()
 weekday_zh = ["一", "二", "三", "四", "五", "六", "日"][today.weekday()]
-st.markdown(f"#### 📆 今天是 {today.strftime('%Y/%m/%d')}（星期{weekday_zh}）")
+md(f"""<div class="date-row">
+    <span class="d-main">📆 今天是 {today.strftime('%Y/%m/%d')}</span>
+    <span class="d-week">星期{weekday_zh}</span>
+    </div>""")
 
 if get_geolocation is None:
     st.warning("需要安裝 streamlit-js-eval 套件才能自動定位（requirements.txt 已包含）。")
@@ -179,7 +188,7 @@ else:
             icon = weather_icon(cw.get("weathercode", -1))
             md(f"""<div class="weather-card">
                 <div class="weather-left">
-                    <div class="weather-icon-box">↖</div>
+                    <div class="weather-icon-box">📍</div>
                     <div>
                         <div class="weather-label">目前城市</div>
                         <div class="weather-city">{city}</div>
@@ -620,6 +629,12 @@ elif active == "🧳 行李":
             st.rerun()
 
     with st.expander("⚙️ 管理家人名單（改名 / 刪除）"):
+        if st.button("🔄 重設為預設名單（政憲、秀英、芍慧、Tiana、小趙、哲安、鶴年、禹喬、禹倩）"):
+            packing["members"] = list(DEFAULT_MEMBERS)
+            packing["current"] = DEFAULT_MEMBERS[0]
+            persist()
+            st.rerun()
+        st.write("---")
         for m in list(packing["members"]):
             c1, c2, c3 = st.columns([2, 2, 1])
             with c1:
