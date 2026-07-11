@@ -242,36 +242,42 @@ if active == "📅 行程":
                 </div>""")
 
     day_card(
-        "📅 7/30 (四) Day 1：凌晨出發，新加坡轉機一日遊 ✈️",
+        "📅 7/30 (四) Day 1：桃園飛新加坡，轉機一日遊 ✈️",
         (None, area_sel in ["全部天數", "新加坡+墨爾本段"]),
-        "新加坡樟宜機場周邊 / 晚間飛墨爾本",
+        "新加坡樟宜機場周邊 / 深夜再飛墨爾本",
         ("timeline-tag-car-no", "❌ 本日不租車"),
         """
-        <div class="timeline-item"><div class="timeline-time">凌晨</div>
-        <div class="timeline-title">🛫 桃園機場出發，飛往新加坡轉機</div>
+        <div class="timeline-item"><div class="timeline-time">01:35</div>
+        <div class="timeline-title">🛫 桃園機場出發 (T1)</div>
         <div class="timeline-desc">提早抵達桃園機場辦理登機，確認澳洲電子簽證(ETA)與國際駕照已備妥。</div></div>
+        <div class="timeline-item"><div class="timeline-time">06:00</div>
+        <div class="timeline-title">🛬 抵達新加坡樟宜機場 (T1)</div>
+        <div class="timeline-desc">一早抵達，整天都可以在新加坡玩，行李可先寄放機場。</div></div>
         <div class="timeline-item"><div class="timeline-time">白天</div>
         <div class="timeline-title">🌺 新加坡一日遊</div>
-        <div class="timeline-desc">濱海灣花園(Gardens by the Bay)、金沙酒店空中花園、烏節路，行李可先寄放機場。</div>
+        <div class="timeline-desc">濱海灣花園(Gardens by the Bay)、金沙酒店空中花園、烏節路。</div>
         <a href="https://www.google.com/maps/dir/?api=1&destination=Gardens+by+the+Bay+Singapore" target="_blank" class="map-btn">📍 濱海灣花園導航</a></div>
-        <div class="timeline-item"><div class="timeline-time">傍晚</div>
-        <div class="timeline-title">✈️ 搭乘晚班機飛往墨爾本</div>
-        <div class="timeline-desc">於樟宜機場辦理登機，飛往墨爾本（隔日抵達）。</div></div>
+        <div class="timeline-item"><div class="timeline-time">次日 02:30</div>
+        <div class="timeline-title">✈️ 深夜班機飛往墨爾本</div>
+        <div class="timeline-desc">於樟宜機場T1辦理登機，凌晨飛往墨爾本，建議晚餐後預留時間到機場。</div></div>
         """,
     )
 
     day_card(
-        "📅 7/31 (五) Day 2：抵達墨爾本 ✈️",
+        "📅 7/31 (五) Day 2：抵達墨爾本，市區景點 ✈️",
         (None, area_sel in ["全部天數", "新加坡+墨爾本段"]),
         "墨爾本小柯林斯智選假日酒店",
-        ("timeline-tag-car-no", "❌ 本日不租車"),
+        ("timeline-tag-car-no", "❌ 本日不租車（大眾運輸）"),
         """
-        <div class="timeline-item"><div class="timeline-time">晚上</div>
-        <div class="timeline-title">✈️ 抵達墨爾本機場 (MEL)</div>
-        <div class="timeline-desc">出關後，搭乘機場 SkyBus 巴士或 Uber/計程車前往市區飯店。</div>
+        <div class="timeline-item"><div class="timeline-time">11:45</div>
+        <div class="timeline-title">🛬 抵達墨爾本塔拉瑪琳機場 (T2)</div>
+        <div class="timeline-desc">出關後，搭乘機場 SkyBus 巴士或 Uber/計程車前往市區。</div>
         <a href="https://www.google.com/maps/dir/?api=1&destination=Melbourne+Airport" target="_blank" class="map-btn">📍 墨爾本機場導航</a></div>
-        <div class="timeline-item"><div class="timeline-time">21:00</div>
-        <div class="timeline-title">🏨 入住飯店休息</div>
+        <div class="timeline-item"><div class="timeline-time">下午</div>
+        <div class="timeline-title">🚋 墨爾本市區景點（搭大眾運輸）</div>
+        <div class="timeline-desc">抵達當天下午就直接安排市區景點，先寄放行李或先辦理入住再出門。</div></div>
+        <div class="timeline-item"><div class="timeline-time">晚上</div>
+        <div class="timeline-title">🏨 入住飯店</div>
         <div class="timeline-desc">入住「墨爾本小柯林斯智選假日酒店」，調整時差。</div></div>
         """,
     )
@@ -299,11 +305,11 @@ if active == "📅 行程":
         "📅 8/2 (日) Day 4：彩虹小屋、蒸汽火車與企鵝歸巢 🚗",
         (None, area_sel in ["全部天數", "新加坡+墨爾本段"]),
         "墨爾本小柯林斯智選假日酒店",
-        ("timeline-tag-car-yes", "🟢 租車 (2台)"),
+        ("timeline-tag-car-yes", "🟢 租車 (2台，不用載行李)"),
         """
-        <div class="timeline-item"><div class="timeline-time">08:30</div>
+        <div class="timeline-item"><div class="timeline-time">08:00</div>
         <div class="timeline-title">🚗 市區取車與出發</div>
-        <div class="timeline-desc">兩位指定駕駛辦理取車手續，熟悉右駕操作後前往 Brighton Beach。</div></div>
+        <div class="timeline-desc">兩位指定駕駛辦理取車手續，熟悉右駕操作後前往 Brighton Beach。今天不用載行李，先租2台。</div></div>
         <div class="timeline-item"><div class="timeline-time">09:30</div>
         <div class="timeline-title">🌈 布萊頓彩虹小屋 (Brighton Bathing Boxes)</div>
         <div class="timeline-desc">五彩繽紛的沙灘更衣小屋，墨爾本必拍地標。</div>
@@ -323,11 +329,11 @@ if active == "📅 行程":
         "📅 8/3 (一) Day 5：世界最美海岸公路大洋路之旅 🚗",
         (None, area_sel in ["全部天數", "新加坡+墨爾本段"]),
         "大洋路旅客公園飯店",
-        ("timeline-tag-car-yes", "🟢 租車 (2台)"),
+        ("timeline-tag-car-yes", "🟢 租車 (加租為3台，需載行李)"),
         """
         <div class="timeline-item"><div class="timeline-time">08:00</div>
-        <div class="timeline-title">🔑 退房，開往大洋路</div>
-        <div class="timeline-desc">辦理退房，正式開往世界級奇景公路 Great Ocean Road。</div></div>
+        <div class="timeline-title">🔑 退房，再多租一台車（共3台），開往大洋路</div>
+        <div class="timeline-desc">今天要載行李，加租第3台車，辦理退房後正式開往世界級奇景公路 Great Ocean Road。</div></div>
         <div class="timeline-item"><div class="timeline-time">11:00</div>
         <div class="timeline-title">🌊 大洋路紀念牌樓 & 奧特威角</div>
         <div class="timeline-desc">Memorial Arch 拍照留念，駕駛請注意休息。</div></div>
@@ -346,14 +352,15 @@ if active == "📅 行程":
         "📅 8/4 (二) Day 6：大洋路回程、還車與飛往雪梨 ✈️",
         (None, area_sel in ["全部天數", "新加坡+墨爾本段", "雪梨段"]),
         "雪梨宜必思 (ibis Styles Sydney Central)",
-        ("timeline-tag-car-yes", "🟢 還車 & 機場移動"),
+        ("timeline-tag-car-yes", "🟢 還車 (3台) & 機場移動"),
         """
         <div class="timeline-item"><div class="timeline-time">09:00</div>
-        <div class="timeline-title">🌊 退房，經內陸線返回墨爾本</div>
-        <div class="timeline-desc">內陸線路程較平坦好開。</div></div>
+        <div class="timeline-title">🌊 離開大洋路，前往阿瓦隆機場</div>
+        <div class="timeline-desc">不用繞回墨爾本市區，直接往國內線阿瓦隆機場(Avalon Airport, AVV)方向開。</div></div>
         <div class="timeline-item"><div class="timeline-time">14:00</div>
-        <div class="timeline-title">⛽ 滿油還車 (墨爾本機場)</div>
-        <div class="timeline-desc">還車前在機場附近加油站加滿油。</div></div>
+        <div class="timeline-title">⛽ 滿油還車 (阿瓦隆機場 AVV)</div>
+        <div class="timeline-desc">3台車在阿瓦隆機場還車，還車前在機場附近加油站加滿油。</div>
+        <a href="https://www.google.com/maps/dir/?api=1&destination=Avalon+Airport+AVV" target="_blank" class="map-btn">📍 阿瓦隆機場導航</a></div>
         <div class="timeline-item"><div class="timeline-time">16:40</div>
         <div class="timeline-title">✈️ 國內線航班：墨爾本飛雪梨</div>
         <div class="timeline-desc">16:40 - 18:10，前往澳洲第一大城雪梨。</div></div>
@@ -409,9 +416,9 @@ if active == "📅 行程":
         "雪梨宜必思 (ibis Styles Sydney Central)",
         ("timeline-tag-car-no", "❌ 本日不租車"),
         """
-        <div class="timeline-item"><div class="timeline-time">09:00</div>
-        <div class="timeline-title">🐋 環形碼頭登船賞鯨</div>
-        <div class="timeline-desc">冬季座頭鯨遷徙期，搭遊艇駛出雪梨港賞鯨。</div>
+        <div class="timeline-item"><div class="timeline-time">09:30</div>
+        <div class="timeline-title">🐋 Captain Cook 賞鯨遊船</div>
+        <div class="timeline-desc">冬季座頭鯨遷徙期，環形碼頭集合搭乘 Captain Cook 賞鯨遊船出海。</div>
         <a href="https://www.google.com/maps/dir/?api=1&destination=Circular+Quay+Sydney" target="_blank" class="map-btn">📍 環形碼頭導航</a></div>
         <div class="timeline-item"><div class="timeline-time">13:30</div>
         <div class="timeline-title">🛍️ 雪梨塔與維多利亞女王大廈 (QVB)</div>
@@ -508,11 +515,11 @@ elif active == "✈️ 航班":
     st.caption("點開每個航班可以幫每位家人填座位與餐食，資料會自動存檔")
 
     FLIGHTS = [
-        {"id": "f1", "label": "台北 → 新加坡", "date": "2026-07-30", "dep": "台北桃園 TPE", "arr": "新加坡樟宜 SIN"},
-        {"id": "f2", "label": "新加坡 → 墨爾本", "date": "2026-07-30", "dep": "新加坡樟宜 SIN", "arr": "墨爾本 MEL（隔日抵達）"},
-        {"id": "f3", "label": "墨爾本 → 雪梨（國內線）", "date": "2026-08-04", "dep": "墨爾本 MEL 16:40", "arr": "雪梨 SYD 18:10"},
-        {"id": "f4", "label": "雪梨 → 黃金海岸（國內線）", "date": "2026-08-08", "dep": "雪梨 SYD 12:20", "arr": "黃金海岸 OOL 13:40"},
-        {"id": "f5", "label": "布里斯本 → 台北", "date": "2026-08-11", "dep": "布里斯本 BNE 22:15", "arr": "台北桃園 TPE 次日05:10"},
+        {"id": "f1", "label": "台北 → 新加坡", "date": "2026-07-30", "dep": "台北桃園 TPE T1　01:35", "arr": "新加坡樟宜 SIN T1　06:00"},
+        {"id": "f2", "label": "新加坡 → 墨爾本", "date": "2026-07-31", "dep": "新加坡樟宜 SIN T1　02:30", "arr": "墨爾本塔拉瑪琳 MEL T2　11:45"},
+        {"id": "f3", "label": "墨爾本(阿瓦隆) → 雪梨（國內線）", "date": "2026-08-04", "dep": "阿瓦隆機場 AVV　16:40", "arr": "雪梨 SYD　18:10"},
+        {"id": "f4", "label": "雪梨 → 黃金海岸（國內線）", "date": "2026-08-08", "dep": "雪梨 SYD　12:20", "arr": "黃金海岸 OOL　13:40"},
+        {"id": "f5", "label": "布里斯本 → 台北", "date": "2026-08-11", "dep": "布里斯本機場　22:15", "arr": "台北桃園 TPE T2　次日05:10"},
     ]
     MEAL_OPTIONS = ["（未選）", "一般餐", "兒童餐", "素食餐", "海鮮餐", "其他"]
 
@@ -539,12 +546,14 @@ elif active == "🚗 租車":
     st.subheader("🚗 租車自駕日程與車輛分配")
     md("""
         <div class="travel-card">
-            <div class="alert-card-success"><strong>🚗 澳洲用車清單（全程共需 2 台中大型休旅車）</strong></div>
+            <div class="alert-card-success"><strong>🚗 澳洲用車清單（墨爾本段 2～3 台，布里斯本段 2 台）</strong></div>
             <p><strong>第一段：墨爾本（彩虹小屋、蒸汽火車、菲利普島、大洋路）</strong></p>
             <ul>
-                <li><strong>用車時間</strong>：8/2 (日) 08:30 ～ 8/4 (二) 14:00 還車（共3天）</li>
-                <li><strong>取還車點</strong>：墨爾本市區取車 / 墨爾本機場 (MEL) 還車</li>
-                <li><strong>車輛配置</strong>：2 台 5-7人座 SUV</li>
+                <li><strong>8/2 (日) 08:00</strong>：先租 2 台（不用載行李，去玩普芬比利火車、彩虹小屋、企鵝歸巢）</li>
+                <li><strong>8/3 (一) 08:00</strong>：加租第 3 台（要載行李出發大洋路），共 3 台</li>
+                <li><strong>8/4 (二) 14:00</strong>：3 台一起在阿瓦隆機場 (Avalon Airport, AVV) 還車</li>
+                <li><strong>取車點</strong>：墨爾本市區　<strong>還車點</strong>：阿瓦隆機場 (AVV)</li>
+                <li><strong>車輛配置</strong>：5-7人座 SUV</li>
             </ul>
             <p><strong>第二段：布里斯本（龍柏無尾熊動物園、庫薩山觀景）</strong></p>
             <ul>
@@ -690,6 +699,15 @@ elif active == "🧳 行李":
 # ------------------------------------------
 elif active == "📌 旅行提醒":
     st.subheader("📌 旅行提醒")
+    st.markdown("##### 💡 貼心提醒")
+    st.markdown(
+        "- 8/2、8/3、8/4、8/10 需租車，請提前預訂並確認駕駛人資訊\n"
+        "- 大洋路行程需較長時間車程，請注意休息與油量\n"
+        "- 8/4 是在阿瓦隆機場 (Avalon Airport, AVV) 還車，不是墨爾本市區\n"
+        "- 回程航班於 8/12 清晨 05:10 抵達桃園機場，請預留接下來的交通時間\n"
+        "- 澳洲天氣多變，建議攜帶保暖衣物與防曬用品"
+    )
+    st.write("---")
     st.markdown("##### ❄️ 澳洲 8 月冬季氣候參考")
     st.markdown(
         "- **墨爾本**：8°C - 14°C 🌧️（濕冷多雨，務必帶防風厚外套與雨傘）\n"
