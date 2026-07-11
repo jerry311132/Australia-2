@@ -90,7 +90,6 @@ custom_css = """
 html, body, .stApp {
     font-family: 'Outfit', 'Noto Sans TC', -apple-system, BlinkMacSystemFont, sans-serif !important;
     background-color: #f7f9fa !important;
-    color: #232d37 !important;
 }
 #MainMenu {visibility: hidden;}
 footer {visibility: hidden;}
